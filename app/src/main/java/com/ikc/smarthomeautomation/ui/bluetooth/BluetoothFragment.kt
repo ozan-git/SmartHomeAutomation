@@ -100,27 +100,22 @@ class BluetoothFragment : Fragment() {
         return
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_ENABLE_BLUETOOTH) {
             when (resultCode) {
                 Activity.RESULT_OK -> when {
-                    mBtAdapter!!.isEnabled -> Toast.makeText(
-                        requireContext(),
-                        "Bluetooth has been enabled.", Toast.LENGTH_SHORT
-                    ).show()
-                    else -> Toast.makeText(
-                        requireContext(),
-                        "Bluetooth has been disabled.", Toast.LENGTH_SHORT
-                    ).show()
+                    mBtAdapter!!.isEnabled -> toast("Bluetooth has been enabled.")
+                    else -> toast("Bluetooth has been disabled.")
                 }
-                Activity.RESULT_CANCELED -> {
-                    Toast.makeText(
-                        requireContext(),
-                        "Bluetooth enabling has been canceled.", Toast.LENGTH_SHORT
-                    ).show()
-                }
+                Activity.RESULT_CANCELED ->
+                    toast("Bluetooth enabling has been canceled.")
             }
         }
+    }
+
+    private fun toast(text: String) {
+        Toast.makeText(requireContext(), text, Toast.LENGTH_SHORT).show()
     }
 }
