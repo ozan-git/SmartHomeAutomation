@@ -1,121 +1,130 @@
 package com.ikc.smarthomeautomation.ui.bluetooth
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothManager
-import android.content.Context
 import android.content.Intent
-import android.os.Build
+import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.AdapterView
+import android.provider.Settings
+import android.view.*
 import android.widget.ArrayAdapter
-import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import android.widget.ListView
+import android.widget.TextView
+import androidx.fragment.app.ListFragment
 import androidx.navigation.fragment.findNavController
 import com.ikc.smarthomeautomation.R
 import com.ikc.smarthomeautomation.databinding.FragmentBluetoothBinding
 
-class BluetoothFragment : Fragment() {
+class BluetoothFragment : ListFragment() {
 
-    private var _binding: FragmentBluetoothBinding? = null
-    private val binding get() = _binding!!
-
-    private var mBtAdapter: BluetoothAdapter? = null
-    private lateinit var mPairedDevices: Set<BluetoothDevice>
 
     companion object {
-        const val EXTRA_ADDRESS: String = "Device_address"
-        const val REQUEST_ENABLE_BLUETOOTH = 1
+        fun newInstance() = BluetoothFragment()
     }
+
+    private var bluetoothAdapter: BluetoothAdapter? = null
+    private val listItems = ArrayList<BluetoothDevice>()
+    private var listAdapter: ArrayAdapter<BluetoothDevice>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
 
-        val bluetoothManager =
-            requireActivity().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        mBtAdapter = bluetoothManager.adapter
-
-        if (mBtAdapter == null) {
-            Toast.makeText(
-                requireContext(),
-                "This device does not support bluetooth.",
-                Toast.LENGTH_SHORT
-            ).show()
-            return
-        }
-        if (!mBtAdapter!!.isEnabled) {
-            val enableBluetoothIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            startActivityForResult(enableBluetoothIntent, REQUEST_ENABLE_BLUETOOTH)
-        }
+        if (requireActivity().packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH))
+            bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
     }
 
-    @RequiresApi(Build.VERSION_CODES.M)
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val bluetoothViewModel = ViewModelProvider(this)[BluetoothViewModel::class.java]
-        _binding = FragmentBluetoothBinding.inflate(inflater, container, false)
-        binding.refreshButton.setOnClickListener { pairedDeviceList() }
-        return binding.root
-    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
+        listAdapter = BluetoothFragment
+        listAdapter = object : ArrayAdapter<BluetoothDevice>(requireContext(), 0, listItems) {
+            override fun getView(position: Int, view: View?, parent: ViewGroup): View {
+                val device = listItems[position]
 
-    @SuppressLint("MissingPermission")
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun pairedDeviceList() {
-        mPairedDevices = mBtAdapter!!.bondedDevices
-        val list: ArrayList<BluetoothDevice> = ArrayList()
-
-        if (mPairedDevices.isNotEmpty()) {
-            for (device: BluetoothDevice in mPairedDevices) {
-                list.add(device)
-                Log.i("Device", "" + device)
+                val deviceName = view!!.findViewById<TextView>(R.id.deviceNameTV)
+                val deviceAddress = view.findViewById<TextView>(R.id.deviceAddressTV)
+                @SuppressLint("MissingPermission")
+                deviceName.text = device.name
+                deviceAddress.text = device.address
+                return view
             }
-        } else {
-            Toast.makeText(context, "No paired bluetooth device found.", Toast.LENGTH_SHORT).show()
         }
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, list)
-        binding.deviceList.adapter = adapter
-        binding.deviceList.onItemClickListener =
-            AdapterView.OnItemClickListener { _, _, position, _ ->
-                val device: BluetoothDevice = list[position]
-                val address: String = device.address
-
-                val bundle = Bundle()
-                bundle.putString(EXTRA_ADDRESS, address)
-                findNavController().navigate(
-                    R.id.action_bluetoothFragment_to_navigation_home,
-                    bundle
-                )
-            }
-        return
     }
 
     @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_ENABLE_BLUETOOTH) {
-            when (resultCode) {
-                Activity.RESULT_OK -> when {
-                    mBtAdapter!!.isEnabled -> toast("Bluetooth has been enabled.")
-                    else -> toast("Bluetooth has been disabled.")
-                }
-                Activity.RESULT_CANCELED ->
-                    toast("Bluetooth enabling has been canceled.")
-            }
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        setListAdapter(null)
+        val header =
+            requireActivity().layoutInflater.inflate(R.layout.device_list_header, null, false)
+        listView.addHeaderView(header, null, false)
+        setEmptyText("initializing...")
+        (listView.emptyView as TextView).textSize = 18f
+        setListAdapter(listAdapter)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_devices, menu)
+        if (bluetoothAdapter == null) menu.findItem(R.id.bt_settings).isEnabled = false
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (bluetoothAdapter == null) setEmptyText("<bluetooth not supported>") else if (!bluetoothAdapter!!.isEnabled) setEmptyText(
+            "<bluetooth is disabled>"
+        ) else setEmptyText("<no bluetooth devices found>")
+        refresh()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        return if (id == R.id.bt_settings) {
+            val intent = Intent()
+            intent.action = Settings.ACTION_BLUETOOTH_SETTINGS
+            startActivity(intent)
+            true
+        } else {
+            super.onOptionsItemSelected(item)
         }
     }
 
-    private fun toast(text: String) {
-        Toast.makeText(requireContext(), text, Toast.LENGTH_SHORT).show()
+    @SuppressLint("MissingPermission")
+    fun refresh() {
+        listItems.clear()
+        if (bluetoothAdapter != null) {
+            for (device in bluetoothAdapter!!.bondedDevices)
+                if (device.type != BluetoothDevice.DEVICE_TYPE_LE) listItems.add(device)
+        }
+
+        listItems.sortWith { a: BluetoothDevice?, b: BluetoothDevice? ->
+            compareTo(a!!, b!!)
+        }
+
+        listAdapter!!.notifyDataSetChanged()
     }
+
+    override fun onListItemClick(l: ListView, v: View, position: Int, id: Long) {
+        val device = listItems[position - 1]
+        val bundle = Bundle()
+        bundle.putString("device", device.address)
+        findNavController().navigate(R.id.action_bluetoothFragment_to_navigation_home, bundle)
+    }
+
+    /**
+     * sort by name, then address. sort named devices first
+     */
+    @SuppressLint("MissingPermission")
+    fun compareTo(a: BluetoothDevice, b: BluetoothDevice): Int {
+        val aValid = a.name != null && a.name.isNotEmpty()
+        val bValid = b.name != null && b.name.isNotEmpty()
+        if (aValid && bValid) {
+            val ret = a.name.compareTo(b.name)
+            return if (ret != 0) ret else a.address.compareTo(b.address)
+        }
+        if (aValid) return -1
+        return if (bValid) +1 else a.address.compareTo(b.address)
+    }
+
 }

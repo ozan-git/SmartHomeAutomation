@@ -8,4 +8,7 @@
     <string name="title_bluetooth_fragment">Bluetooth</string>
     <string name="bluetooth_connection">Bluetooth Connection</string>
     <string name="toggle_button">Toggle Button</string>
+    <string name="led_on">Led On</string>
+    <string name="led_off">LED OFF</string>
+    <string name="devices">Bluetooth Devices</string>
 </resources>
