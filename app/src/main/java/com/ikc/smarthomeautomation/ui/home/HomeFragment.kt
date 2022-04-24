@@ -15,8 +15,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.ikc.smarthomeautomation.databinding.FragmentHomeBinding
+import com.ikc.smarthomeautomation.ui.SharedViewModel
 import java.io.IOException
 import java.util.*
 
@@ -27,6 +29,9 @@ class HomeFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+    private val sharedViewModel: SharedViewModel by activityViewModels()
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,8 +40,8 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        val homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
 
+        val homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         return binding.root
     }
 

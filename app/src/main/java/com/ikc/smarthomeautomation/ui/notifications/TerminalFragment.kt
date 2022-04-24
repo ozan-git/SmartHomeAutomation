@@ -13,28 +13,29 @@ import android.text.style.ForegroundColorSpan
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.ikc.smarthomeautomation.R
-import com.ikc.smarthomeautomation.databinding.FragmentNotificationsBinding
+import com.ikc.smarthomeautomation.databinding.FragmentTerminalBinding
 import com.ikc.smarthomeautomation.network.SerialListener
 import com.ikc.smarthomeautomation.network.SerialService
 import com.ikc.smarthomeautomation.network.SerialService.SerialBinder
 import com.ikc.smarthomeautomation.network.SerialSocket
+import com.ikc.smarthomeautomation.ui.SharedViewModel
 import com.ikc.smarthomeautomation.utils.TextUtil
 import com.ikc.smarthomeautomation.utils.TextUtil.HexWatcher
 
-class NotificationsFragment : Fragment(), ServiceConnection, SerialListener {
+class TerminalFragment : Fragment(), ServiceConnection, SerialListener {
 
-    private var _binding: FragmentNotificationsBinding? = null
+    private var _binding: FragmentTerminalBinding? = null
     private val binding get() = _binding!!
 
-    private var deviceAddress: String? = null
-    private var service: SerialService? = null
     private var hexWatcher: HexWatcher? = null
     private var connected = Connected.False
     private var initialStart = true
     private var hexEnabled = false
     private var pendingNewline = false
     private var newline: String = TextUtil.newline_crlf
+    private val sharedViewModel: SharedViewModel by activityViewModels()
 
     /**
      * Lifecycle
@@ -43,7 +44,6 @@ class NotificationsFragment : Fragment(), ServiceConnection, SerialListener {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         retainInstance = true
-        deviceAddress = requireArguments().getString("device")
     }
 
     override fun onDestroy() {
@@ -54,28 +54,23 @@ class NotificationsFragment : Fragment(), ServiceConnection, SerialListener {
 
     override fun onStart() {
         super.onStart()
-        if (service != null) service!!.attach(this) else requireActivity().startService(
-            Intent(
-                activity,
-                SerialService::class.java
-            )
-        )
+        if (sharedViewModel.service != null)
+            sharedViewModel.service!!.attach(this)
+        else
+            requireActivity().startService(Intent(activity, SerialService::class.java))
         // prevents service destroy on unbind from recreated activity caused by orientation change
     }
 
-    override fun onStop() {
-        if (service != null && !requireActivity().isChangingConfigurations) service!!.detach()
-        super.onStop()
-    }
+//    override fun onStop() {
+//        if (service != null && !requireActivity().isChangingConfigurations)
+//            service!!.detach()
+//        super.onStop()
+//    }
 
     @Deprecated("Deprecated in Java")
     override fun onAttach(activity: Activity) {
         super.onAttach(activity)
-        requireActivity().bindService(
-            Intent(getActivity(), SerialService::class.java),
-            this,
-            Context.BIND_AUTO_CREATE
-        )
+        requireActivity().bindService(Intent(requireActivity(), SerialService::class.java), this, Context.BIND_AUTO_CREATE)
     }
 
     override fun onDetach() {
@@ -88,15 +83,15 @@ class NotificationsFragment : Fragment(), ServiceConnection, SerialListener {
 
     override fun onResume() {
         super.onResume()
-        if (initialStart && service != null) {
+        if (initialStart && sharedViewModel.service != null) {
             initialStart = false
             requireActivity().runOnUiThread { connect() }
         }
     }
 
     override fun onServiceConnected(name: ComponentName, binder: IBinder) {
-        service = (binder as SerialBinder).service
-        service!!.attach(this)
+        sharedViewModel.service = (binder as SerialBinder).service
+        sharedViewModel.service!!.attach(this)
         if (initialStart && isResumed) {
             initialStart = false
             requireActivity().runOnUiThread { connect() }
@@ -104,7 +99,7 @@ class NotificationsFragment : Fragment(), ServiceConnection, SerialListener {
     }
 
     override fun onServiceDisconnected(name: ComponentName) {
-        service = null
+        sharedViewModel.service = null
     }
 
     /*
@@ -115,7 +110,7 @@ class NotificationsFragment : Fragment(), ServiceConnection, SerialListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentNotificationsBinding.inflate(inflater, container, false)
+        _binding = FragmentTerminalBinding.inflate(inflater, container, false)
 
         val view = binding.root
         binding.receiveText.setTextColor(resources.getColor(R.color.colorRecieveText)) // set as default color to reduce number of spans
@@ -124,8 +119,7 @@ class NotificationsFragment : Fragment(), ServiceConnection, SerialListener {
         hexWatcher!!.enable(hexEnabled)
         binding.sendText.addTextChangedListener(hexWatcher)
         binding.sendText.hint = if (hexEnabled) "HEX mode" else ""
-        val sendBtn = view.findViewById<View>(R.id.send_btn)
-        sendBtn.setOnClickListener {
+        binding.sendBtn.setOnClickListener {
             send(binding.sendText.text.toString())
         }
         return view
@@ -180,11 +174,11 @@ class NotificationsFragment : Fragment(), ServiceConnection, SerialListener {
     private fun connect() {
         try {
             val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-            val device = bluetoothAdapter.getRemoteDevice(deviceAddress)
+            val device = bluetoothAdapter.getRemoteDevice(sharedViewModel.deviceAddress)
             status("connecting...")
             connected = Connected.Pending
             val socket = SerialSocket(requireActivity().applicationContext, device)
-            service!!.connect(socket)
+            sharedViewModel.service!!.connect(socket)
         } catch (e: Exception) {
             onSerialConnectError(e)
         }
@@ -192,7 +186,7 @@ class NotificationsFragment : Fragment(), ServiceConnection, SerialListener {
 
     private fun disconnect() {
         connected = Connected.False
-        service!!.disconnect()
+        sharedViewModel.service!!.disconnect()
     }
 
     private fun send(str: String) {
@@ -221,7 +215,7 @@ class NotificationsFragment : Fragment(), ServiceConnection, SerialListener {
                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
             )
             binding.receiveText.append(spn)
-            service!!.write(data)
+            sharedViewModel.service!!.write(data)
         } catch (e: Exception) {
             onSerialIoError(e)
         }

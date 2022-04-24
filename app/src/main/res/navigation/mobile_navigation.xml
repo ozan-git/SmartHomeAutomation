@@ -18,10 +18,10 @@
         tools:layout="@layout/fragment_dashboard" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.ikc.smarthomeautomation.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/navigation_terminal"
+        android:name="com.ikc.smarthomeautomation.ui.notifications.TerminalFragment"
+        android:label="@string/title_terminal"
+        tools:layout="@layout/fragment_terminal" />
     <fragment
         android:id="@+id/bluetoothFragment"
         android:name="com.ikc.smarthomeautomation.ui.bluetooth.BluetoothFragment"
