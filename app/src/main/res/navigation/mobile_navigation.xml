@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/navigation_terminal"
-        android:name="com.ikc.smarthomeautomation.ui.notifications.TerminalFragment"
+        android:name="com.ikc.smarthomeautomation.ui.terminal.TerminalFragment"
         android:label="@string/title_terminal"
         tools:layout="@layout/fragment_terminal" />
     <fragment

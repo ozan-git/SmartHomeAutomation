@@ -1,4 +1,4 @@
-package com.ikc.smarthomeautomation.ui.notifications
+package com.ikc.smarthomeautomation.ui.terminal
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -48,6 +48,7 @@ class TerminalFragment : Fragment(), ServiceConnection, SerialListener {
 
     override fun onDestroy() {
         if (connected != Connected.False) disconnect()
+
         requireActivity().stopService(Intent(activity, SerialService::class.java))
         super.onDestroy()
     }
@@ -273,7 +274,8 @@ class TerminalFragment : Fragment(), ServiceConnection, SerialListener {
         disconnect()
     }
 
-    private enum class Connected {
+    enum class Connected {
         False, Pending, True
     }
+
 }
