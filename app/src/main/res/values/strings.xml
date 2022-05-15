@@ -5,9 +5,18 @@
     <string name="title_terminal">Terminal</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="title_bluetooth_fragment">Bluetooth</string>
-    <string name="bluetooth_connection">Bluetooth Connection</string>
+    <string name="bluetooth_connection">Select Your Bluetooth Device</string>
     <string name="led_on">Led On</string>
     <string name="led_off">LED OFF</string>
-    <string name="refresh">REFRESH</string>
+    <string name="refresh_list">REFRESH LIST</string>
     <string name="bluetooth_settings">Bluetooth settings</string>
+    <string name="blinder">BLINDER</string>
+    <string name="living_room">Living Room</string>
+    <string name="todo">TODO</string>
+    <string name="room_light">Room Light</string>
+    <string name="tv_room">TV Room</string>
+    <string name="tv_power">TV power</string>
+    <string name="kitchen">Kitchen</string>
+    <string name="coffee_machine">Coffee Machine</string>
+    <string name="blinds">Blinds</string>
 </resources>

@@ -71,15 +71,21 @@ class TerminalFragment : Fragment(), ServiceConnection, SerialListener {
     @Deprecated("Deprecated in Java")
     override fun onAttach(activity: Activity) {
         super.onAttach(activity)
-        requireActivity().bindService(Intent(requireActivity(), SerialService::class.java), this, Context.BIND_AUTO_CREATE)
+
+        requireActivity().bindService(
+            Intent(
+                requireActivity(), SerialService::class.java
+            ), this, Context.BIND_AUTO_CREATE
+        )
     }
 
     override fun onDetach() {
+        super.onDetach()
+
         try {
             requireActivity().unbindService(this)
         } catch (ignored: Exception) {
         }
-        super.onDetach()
     }
 
     override fun onResume() {
@@ -103,9 +109,6 @@ class TerminalFragment : Fragment(), ServiceConnection, SerialListener {
         sharedViewModel.service = null
     }
 
-    /*
-     * UI
-     */
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -120,9 +123,8 @@ class TerminalFragment : Fragment(), ServiceConnection, SerialListener {
         hexWatcher!!.enable(hexEnabled)
         binding.sendText.addTextChangedListener(hexWatcher)
         binding.sendText.hint = if (hexEnabled) "HEX mode" else ""
-        binding.sendBtn.setOnClickListener {
-            send(binding.sendText.text.toString())
-        }
+
+        binding.sendBtn.setOnClickListener { send(binding.sendText.text.toString()) }
         return view
     }
 
@@ -277,5 +279,4 @@ class TerminalFragment : Fragment(), ServiceConnection, SerialListener {
     enum class Connected {
         False, Pending, True
     }
-
 }

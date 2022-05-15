@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="vertical"
     tools:context=".ui.terminal.TerminalFragment">
 
@@ -34,7 +35,7 @@
             android:layout_weight="1"
             android:inputType="text|textNoSuggestions"
             android:singleLine="true"
-            tools:ignore="Autofill" />
+            tools:ignore="Autofill,LabelFor" />
 
         <ImageButton
             android:id="@+id/send_btn"

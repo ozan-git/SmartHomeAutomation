@@ -32,7 +32,6 @@ class BluetoothFragment : Fragment() {
     private lateinit var mPairedDevices: Set<BluetoothDevice>
     private val sharedViewModel: SharedViewModel by activityViewModels()
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
