@@ -1,0 +1,25 @@
+0	1	mikroCPIC1618.exe -MSF -DBG -pP18F45K22 -DL -O11111114 -fo8 -N"G:\My Drive\6_Term\Microprocessors\MPPROJECT\180403064_SmartHome_Project\WashMachMC\WashingMachineMC.mcppi" -SP"C:\Users\Public\Documents\Mikroelektronika\mikroC PRO for PIC\Defs\" -SP"C:\Users\Public\Documents\Mikroelektronika\mikroC PRO for PIC\uses\P18\" -SP"G:\My Drive\6_Term\Microprocessors\MPPROJECT\180403064_SmartHome_Project\WashMachMC\" -IP"C:\Users\Public\Documents\Mikroelektronika\mikroC PRO for PIC\uses\P18\" "digital_keypad.c" "isr.c" "timers.c" "WashingMachineMC.c" "__Lib_Math.mcl" "__Lib_MathDouble.mcl" "__Lib_System.mcl" "__Lib_Delays.mcl" "__Lib_CType.mcl" "__Lib_CString.mcl" "__Lib_Conversions.mcl" "__Lib_Sprintf.mcl" "__Lib_LcdConsts.mcl" "__Lib_Lcd.mcl"	 
+hint: 0	1139	Available RAM: 1515 [bytes], Available ROM: 32768 [bytes]	 
+diagnostics: 0	122	Compilation Started	__Lib_Delays.c
+diagnostics: 172	123	Compiled Successfully	__Lib_Delays.c
+diagnostics: 0	122	Compilation Started	digital_keypad.h
+diagnostics: 53	123	Compiled Successfully	digital_keypad.c
+diagnostics: 0	122	Compilation Started	digital_keypad.h
+diagnostics: 25	123	Compiled Successfully	isr.c
+diagnostics: 0	122	Compilation Started	timers.c
+diagnostics: 14	123	Compiled Successfully	timers.c
+diagnostics: 0	122	Compilation Started	digital_keypad.h
+warning: 370	1506	Implicit conversion of pointer to int	WashingMachineMC.c
+warning: 373	1508	Implicit conversion of int to ptr	WashingMachineMC.c
+warning: 376	1508	Implicit conversion of int to ptr	WashingMachineMC.c
+warning: 423	1508	Implicit conversion of int to ptr	WashingMachineMC.c
+warning: 426	1508	Implicit conversion of int to ptr	WashingMachineMC.c
+warning: 451	1508	Implicit conversion of int to ptr	WashingMachineMC.c
+diagnostics: 453	123	Compiled Successfully	WashingMachineMC.c
+diagnostics: 0	127	All files Compiled in 500 ms	 
+hint: 0	1144	Used RAM (bytes): 675 (45%)  Free RAM (bytes): 840 (55%)	Used RAM (bytes): 675 (45%)  Free RAM (bytes): 840 (55%)
+hint: 0	1144	Used ROM (bytes): 7204 (22%)  Free ROM (bytes): 25564 (78%)	Used ROM (bytes): 7204 (22%)  Free ROM (bytes): 25564 (78%)
+diagnostics: 0	125	Project Linked Successfully	WashingMachineMC.mcppi
+diagnostics: 0	128	Linked in 141 ms	 
+diagnostics: 0	129	Project 'WashingMachineMC.mcppi' completed: 782 ms	 
+diagnostics: 0	103	Finished successfully: 14 Jun 2022, 18:34:55	WashingMachineMC.mcppi
